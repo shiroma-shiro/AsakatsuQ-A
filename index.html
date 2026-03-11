@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>朝活交流会 Q&A Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    
+    <div class="container">
+        <header class="glass-panel">
+            <div class="header-content">
+                <h1>朝活交流会 Q&A Dashboard</h1>
+                <p>Morning Activity Support Chat - Insights & Summaries</p>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <span class="stat-value">8</span>
+                    <span class="stat-label">Questions</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value">15+</span>
+                    <span class="stat-label">Members</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- Q1: AI活用術 -->
+            <section class="glass-card full-width list-card" id="q1-card">
+                <div class="card-header">
+                    <h2>🤖 皆さんのAI活用術</h2>
+                    <span class="questioner-badge">🙋‍♂️ 質問者: とらすけ</span>
+                </div>
+                <div class="ai-list-container" id="ai-usage-list"></div>
+            </section>
+
+            <!-- Q2: リベッター活用状況 -->
+            <section class="glass-card chart-card">
+                <div class="card-header">
+                    <h2>💬 リベッター活用状況</h2>
+                    <span class="questioner-badge">🙋‍♀️ 質問者: つばき</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="ribetterChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Q4: プロンプトキーワード -->
+            <section class="glass-card tags-card">
+                <div class="card-header">
+                    <h2>🔑 プロンプトキーワード</h2>
+                    <span class="questioner-badge">🙋‍♂️ 質問者: しろま</span>
+                </div>
+                <div class="tags-container" id="prompt-tags"></div>
+            </section>
+
+            <!-- Q3: USJオフ会 -->
+            <section class="glass-card grid-card">
+                <div class="card-header">
+                    <h2>🎢 USJオフ会の楽しみ方</h2>
+                    <span class="questioner-badge">🙋‍♀️ 質問者: エムアミ</span>
+                </div>
+                <ul class="bullet-list" id="usj-tips"></ul>
+            </section>
+
+            <!-- Q8: 眠気対策 -->
+            <section class="glass-card alert-card">
+                <div class="card-header">
+                    <h2>💤 昼間の眠気対策 (最終兵器)</h2>
+                    <span class="questioner-badge">🙋‍♂️ 質問者: ふじまる</span>
+                </div>
+                <ul class="alert-list" id="sleepiness-list"></ul>
+            </section>
+
+            <!-- Q5: おすすめ旅行先 -->
+            <section class="glass-card full-width places-card">
+                <div class="card-header">
+                    <h2>✈️ おすすめ旅行先 MAP</h2>
+                    <span class="questioner-badge">🙋‍♀️ 質問者: ネアン</span>
+                </div>
+                <div id="map" class="map-container"></div>
+                <div class="places-grid" id="travel-places" style="margin-top: 1.5rem;"></div>
+            </section>
+
+            <!-- Q6: モーニングルーティン -->
+            <section class="glass-card full-width routine-card">
+                <div class="card-header">
+                    <h2>🌅 モーニングルーティン (タイムライン)</h2>
+                    <span class="questioner-badge">🙋‍♀️ 質問者: しほみ</span>
+                </div>
+                <div class="timeline-container" id="morning-routine"></div>
+            </section>
+
+            <!-- Q7: ご飯の固定化 -->
+            <section class="glass-card full-width meals-card">
+                <div class="card-header">
+                    <h2>🍚 ご飯の固定化 (Nanobanana風)</h2>
+                    <span class="questioner-badge">🙋‍♀️ 質問者: えんぴつ</span>
+                </div>
+                <div class="nanobanana-grid" id="meals-list"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
