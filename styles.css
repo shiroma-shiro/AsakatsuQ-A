@@ -414,6 +414,13 @@ header p {
     border-color: var(--accent-secondary);
 }
 
+.place-card.active {
+    border-color: var(--accent-tertiary);
+    background: rgba(236, 72, 153, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+}
+
 .place-name {
     font-weight: 600;
     color: #fff;
@@ -436,6 +443,32 @@ header p {
     border-radius: 12px;
     border: 1px solid var(--glass-border);
     z-index: 1; /* relative to glass */
+}
+
+.pulse-pin {
+    background-color: transparent !important;
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 50%;
+    box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+    animation: pulse 1.5s infinite;
+    margin-left: -8px !important;
+    margin-top: -8px !important;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
+    }
+    70% {
+        transform: scale(1.5);
+        box-shadow: 0 0 0 15px rgba(236, 72, 153, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(236, 72, 153, 0);
+    }
 }
 .leaflet-container {
     background: #1e293b; /* leafet dark bg */
@@ -529,4 +562,5 @@ header p {
     .dashboard-grid { display: flex; flex-direction: column; }
     .header-stats { display: none; }
     .check-list { grid-template-columns: 1fr; }
+    .maps-layout { grid-template-columns: 1fr !important; }
 }

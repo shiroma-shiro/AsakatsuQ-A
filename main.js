@@ -82,9 +82,9 @@ const data = {
       }
     ],
     q7_meals: [
-      { title: "【朝】定番和食", type: "Morning", text: "ご飯、納豆、味噌汁の和食率が高め。白湯やプロテイン、オートミール等健康志向も！お子様はパン＆フルーツが多いようです。", img: "./images/breakfast.png" },
-      { title: "【昼】手軽＆完全栄養", type: "Lunch", text: "手作りのお弁当や、Huelなどの完全栄養食、残り物など、手軽さを重視したラインナップです。", img: "./images/lunch.png" },
-      { title: "【夜】洗い物削減", type: "Dinner", text: "一汁二菜や、ワンプレートに盛り付けるなど、夜はなるべく洗い物を削減する工夫が見られました。", img: "./images/dinner.png" }
+      { title: "【朝】定番和食", type: "Morning", text: "ご飯、納豆、味噌汁の和食率が高め。白湯やプロテイン、オートミール等健康志向も！お子様はパン＆フルーツが多いようです。", img: "./images/breakfast.png", answers: [{name: "えんぴつ", detail: "定番和食"}, {name: "しほみ", detail: "パン＆フルーツ"}, {name: "AYA", detail: "白湯やプロテイン"}] },
+      { title: "【昼】手軽＆完全栄養", type: "Lunch", text: "手作りのお弁当や、Huelなどの完全栄養食、残り物など、手軽さを重視したラインナップです。", img: "./images/lunch.png", answers: [{name: "つばき", detail: "手作り弁当"}, {name: "さとしん", detail: "残り物を活用"}, {name: "しろま", detail: "完全栄養食Huel"}] },
+      { title: "【夜】洗い物削減", type: "Dinner", text: "一汁二菜や、ワンプレートに盛り付けるなど、夜はなるべく洗い物を削減する工夫が見られました。", img: "./images/dinner.png", answers: [{name: "とらすけ", detail: "一汁二菜"}, {name: "くまくま", detail: "ワンプレート"}, {name: "ふじまる", detail: "洗い物を削減する"}] }
     ],
     q8_sleepiness: [
       { name: "ふじまる", text: "激辛わさび柿ピーを食べる 🔥" },
@@ -186,6 +186,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // Render Q7: Meals (Nanobanana style)
     const mealsList = document.getElementById("meals-list");
     data.q7_meals.forEach(meal => {
+        let respondersHTML = '<div class="meal-responders" style="margin-top: 1rem; border-top: 1px solid var(--glass-border); padding-top: 0.8rem;">';
+        if (meal.answers) {
+            meal.answers.forEach(ans => {
+                respondersHTML += `<div style="font-size: 0.85rem; margin-bottom: 0.5rem; color: #e2e8f0;">👤 <strong>${ans.name}</strong> ${responderBadge} : <span style="color: #94a3b8;">${ans.detail}</span></div>`;
+            });
+        }
+        respondersHTML += '</div>';
+
         const div = document.createElement("div");
         div.className = "meal-card";
         div.innerHTML = `
@@ -196,12 +204,63 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="meal-info">
                 <h3 style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">${meal.title}</h3>
                 <div class="meal-desc">${meal.text}</div>
+                ${respondersHTML}
             </div>
         `;
         mealsList.appendChild(div);
     });
 
-    // Render Q5: Travel Places
+    // Initialize Leaflet Maps
+    const mapJapanEl = document.getElementById('map-japan');
+    const mapWorldEl = document.getElementById('map-world');
+    
+    let mapJapan, mapWorld;
+    const markers = []; // Track markers for animation
+
+    // Custom Leaflet Marker Icons
+    const pinkIcon = L.divIcon({
+        className: 'custom-pin',
+        html: '<div style="background-color: var(--accent-tertiary); width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px var(--accent-tertiary);"></div>',
+        iconAnchor: [6, 6]
+    });
+
+    const activeIcon = L.divIcon({
+        className: 'custom-pin pulse-pin',
+        html: '<div style="background-color: var(--accent-tertiary); width: 100%; height: 100%; border-radius: 50%;"></div>',
+        iconAnchor: [8, 8]
+    });
+
+    if (mapJapanEl && mapWorldEl) {
+        // Setup Map Japan
+        mapJapan = L.map('map-japan', { zoomControl: true, maxZoom: 18, minZoom: 2, attributionControl: false }).setView([37.5, 137.0], 4);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(mapJapan);
+
+        // Setup Map World
+        mapWorld = L.map('map-world', { zoomControl: true, maxZoom: 18, minZoom: 1, attributionControl: false }).setView([20, 0], 1);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(mapWorld);
+
+        // Add Markers and Bind Popups
+        data.q5_travel.forEach(placeInfo => {
+            if (placeInfo.coords && placeInfo.coords.length > 0) {
+                placeInfo.coords.forEach(coord => {
+                    const isJapan = (coord[0] >= 20 && coord[0] <= 46 && coord[1] >= 122 && coord[1] <= 154);
+                    const targetMap = isJapan ? mapJapan : mapWorld;
+                    
+                    const marker = L.marker(coord, { icon: pinkIcon }).addTo(targetMap)
+                        .bindPopup(`<strong>${placeInfo.place}</strong><br>👤 ${placeInfo.name}`);
+                    
+                    markers.push({
+                        placeName: placeInfo.place,
+                        marker: marker,
+                        mapInstance: targetMap,
+                        coord: coord
+                    });
+                });
+            }
+        });
+    }
+
+    // Render Q5: Travel Places (Cards)
     const placesGrid = document.getElementById("travel-places");
     data.q5_travel.forEach(place => {
         const div = document.createElement("div");
@@ -210,41 +269,25 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="place-name">📍 ${place.place}</div>
             <div class="place-user">👤 ${place.name} ${responderBadge}</div>
         `;
+        
+        div.addEventListener('click', () => {
+            // Reset all cards and markers
+            document.querySelectorAll('.place-card').forEach(el => el.classList.remove('active'));
+            markers.forEach(m => m.marker.setIcon(pinkIcon));
+            
+            div.classList.add('active');
+            
+            // Highlight matching markers
+            const relatedMarkers = markers.filter(m => m.placeName === place.place);
+            relatedMarkers.forEach(m => {
+                m.marker.setIcon(activeIcon);
+                // Adjust zoom level dynamically
+                const zoomLevel = m.mapInstance === mapJapan ? 6 : 4;
+                m.mapInstance.flyTo(m.coord, zoomLevel, { animate: true, duration: 1.5 });
+                m.marker.openPopup();
+            });
+        });
+        
         placesGrid.appendChild(div);
     });
-
-    // Initialize Leaflet Map
-    if (document.getElementById('map')) {
-        const isDarkMode = true;
-        
-        // Setup Map View centrally over Japan
-        const map = L.map('map', {
-            zoomControl: true,
-            maxZoom: 18,
-            minZoom: 2,
-            attributionControl: false
-        }).setView([35.689, 139.691], 3);
-
-        // Add Dark Theme Map Tiles
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-        }).addTo(map);
-
-        // Custom Leaflet Marker Icon to fit theme
-        const pinkIcon = L.divIcon({
-            className: 'custom-pin',
-            html: '<div style="background-color: var(--accent-tertiary); width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px var(--accent-tertiary);"></div>',
-            iconAnchor: [6, 6]
-        });
-
-        // Add Markers and Bind Popups
-        data.q5_travel.forEach(placeInfo => {
-            if (placeInfo.coords && placeInfo.coords.length > 0) {
-                placeInfo.coords.forEach(coord => {
-                    L.marker(coord, { icon: pinkIcon }).addTo(map)
-                        .bindPopup(`<strong>${placeInfo.place}</strong><br>👤 ${placeInfo.name}`);
-                });
-            }
-        });
-    }
 });
